@@ -14,16 +14,16 @@ jobs:
 
     - name: Save EC2 Key
       run: |
-        echo "${{ secrets.EC2_KEY }}" | base64 -d > key.pem
-        chmod 400 key.pem
+        echo "${{ secrets.EC2_KEY }}" | base64 -d > devops-key.pem
+        chmod 400 devops-key.pem
 
     - name: Copy Files to EC2
       run: |
-        scp -o StrictHostKeyChecking=no -i key.pem -r . ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/app
+        scp -o StrictHostKeyChecking=no -i devops-key.pem -r . ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/app
 
     - name: Deploy on EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i devops-key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/ec2-user/app
           docker stop node-app || true && docker rm node-app || true
           docker build -t node-app .
